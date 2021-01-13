@@ -1,1 +1,2 @@
-# ADP-compare-with-NMPC-2
+# Demo for approximate dynamic programming
+
