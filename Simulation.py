@@ -36,7 +36,7 @@ def simulation(methods, log_dir, simu_dir):
 
     for method in methods:
         cal_time = 0
-        state = torch.tensor([[0.0, 0.0, config.psi_init, 0.0, 0.0]])
+        state = torch.tensor([[1.0, 0.0, config.psi_init, 0.0, 0.0]])
         # state = torch.tensor([[0.0, 0.0, 0.0, 0.0, 0.0]])
         state.requires_grad_(False)
         # x_ref = statemodel_plt.reference_trajectory(state[:, -1])
@@ -47,12 +47,22 @@ def simulation(methods, log_dir, simu_dir):
         state_history = state.detach().numpy()
         control_history = []
 
+        # using relative states to calculate value function
+        with torch.no_grad():
+            value_history=value.forward(state_r[:, 0:4]).numpy()
+
         print('\nCALCULATION TIME:')
         for i in range(plot_length):
             if method == 'ADP':
                 time_start = time.time()
                 u = policy.forward(state_r[:, 0:4])
                 cal_time += time.time() - time_start
+
+                # using relative states to calculate value function
+                with torch.no_grad():
+                    now_value=value.forward(state_r[:, 0:4]).numpy()
+                value_history = np.append(value_history, now_value)
+
             elif method == 'MPC':
                 x = state_r.tolist()[0]
                 time_start = time.time()
@@ -75,7 +85,7 @@ def simulation(methods, log_dir, simu_dir):
             # s = state_next.detach().numpy()
             state_history = np.append(state_history, state.detach().numpy(), axis=0)
             control_history = np.append(control_history, u.detach().numpy())
-
+            
 
 
         if method == 'ADP':
@@ -94,10 +104,12 @@ def simulation(methods, log_dir, simu_dir):
     adp_simulation_plot(simu_dir)
     plot_comparison(simu_dir, methods)
 
+    np.savetxt(os.path.join(simu_dir,"ADP_value.txt"),value_history)
+
 
 
 if __name__ == '__main__':
-    log_dir = "./Results_dir/2020-11-04-19-33-10000" # 2020-10-09-14-42-10000
+    log_dir = "D:\CppAndPython\PythonProject\Feasible_Region\Reinforcement-learning-and-control-chapter-8-demo\Results_dir\\2020-06-11-13-24-10" # 2020-10-09-14-42-10000
     methods = ['MPC','ADP']
     simu_dir = "./Simulation_dir/" + datetime.now().strftime("%Y-%m-%d-%H-%M")
     os.makedirs(simu_dir, exist_ok=True)

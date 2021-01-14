@@ -7,7 +7,7 @@ from utils import Numpy2Torch, myplot
 # path_dir: directory to save simulation results
 # load_dir: directory to save network models
 
-path_dir = "./Simulation_dir/2021-01-14-14-11"
+path_dir = "./Simulation_dir/2021-01-14-14-54"
 load_dir = "./Results_dir/2020-06-11-13-24-10"
 
 

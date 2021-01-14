@@ -25,13 +25,13 @@ from tensorboardX import SummaryWriter
 
 # Parameters
 init_print()
-MAX_ITERATION = 10000        # max iterations
+MAX_ITERATION = 1000       # max iterations
 LR_P = 8e-4                 # learning rate of policy net
 LR_V = 3e-3                # learning rate of value net
 
 # tasks
-TRAIN_FLAG = 1
-LOAD_PARA_FLAG = 0
+TRAIN_FLAG = 0
+LOAD_PARA_FLAG = 1
 SIMULATION_FLAG = 1
 
 # Set random seed
@@ -51,12 +51,12 @@ iteration_index = 0
 if LOAD_PARA_FLAG == 1:
     print("********************************* LOAD PARAMETERS *********************************")
     # load pre-trained parameters
-    load_dir = "./Results_dir/2020-10-09-14-42-10000"
+    load_dir = "./Results_dir/2021-01-14-10-40-1000"
     policy.load_parameters(load_dir)
     value.load_parameters(load_dir)
 
 if TRAIN_FLAG == 1:
-    print_iters = 10
+    print_iters = 100
     print("********************************** START TRAINING **********************************")
     print("************************** PRINT LOSS EVERY "+ str(print_iters) + "iterations ***************************")
     # train the network by policy iteration
