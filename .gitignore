@@ -1,5 +1,5 @@
 /docs/
 /.idea/
-/Results_dir/
-/Simulation_dir/
-/__pycache__/
+#/Results_dir/
+#/Simulation_dir/
+#/__pycache__/
