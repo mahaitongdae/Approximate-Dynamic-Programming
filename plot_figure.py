@@ -1,7 +1,7 @@
 import numpy as np
 import os
 from Config import DynamicsConfig
-from utils import myplot, Numpy2Torch
+from utils import idplot, Numpy2Torch
 import Dynamics
 S_DIM = 4
 A_DIM = 1
@@ -21,6 +21,7 @@ def plot_comparison(simu_dir, methods):
     num_methods = len(methods)
     legends = ['MPC-3','MPC-5','MPC-10','ADP','Open-loop']
     picture_dir = simu_dir + "/Figures"
+    if not os.path.exists(picture_dir): os.mkdir(picture_dir)
     config = DynamicsConfig()
     trajectory_data = []
     heading_angle = []
@@ -160,14 +161,14 @@ def plot_comparison(simu_dir, methods):
             psi_error_data.append(open_loop_psi_error)
             control_plot_data.append(open_loop_control_tuple)
             utilities.append(open_loop_utilities_tuple)
-        myplot(trajectory_data, num_methods, "xy",
+        idplot(trajectory_data, num_methods, "xy",
                fname=os.path.join(picture_dir, 'trajectory.png'),
                xlabel="Longitudinal position [m]",
                ylabel="Lateral position [m]",
                legend=legends,
                legend_loc="lower left"
                )
-        myplot(utilities, num_methods, "xy",
+        idplot(utilities, num_methods, "xy",
                fname=os.path.join(picture_dir, 'utilities.png'),
                xlabel="Longitudinal position [m]",
                ylabel="Utilities",
@@ -188,7 +189,7 @@ def plot_comparison(simu_dir, methods):
         #     open_loop_state = np.loadtxt(os.path.join(simu_dir, 'Open_loop_state.txt'))
         #     open_loop_trajectory = (open_loop_state[:, 4], open_loop_state[:, 2])
         #     heading_angle.append(open_loop_trajectory)
-        myplot(heading_angle, num_methods, "xy",
+        idplot(heading_angle, num_methods, "xy",
                fname=os.path.join(picture_dir, 'trajectory_heading_angle.png'),
                xlabel="Longitudinal position [m]",
                ylabel=r"Heading angle [$\degree$]",
@@ -212,7 +213,7 @@ def plot_comparison(simu_dir, methods):
         # if 'OP' in methods:
         #     open_loop_error = (open_loop_state[:, 4], open_loop_state[:, 0] - config.a_curve * np.sin(config.k_curve * open_loop_state[:, 4]))
         #     error_data.append(open_loop_error)
-        myplot(error_data, num_methods, "xy",
+        idplot(error_data, num_methods, "xy",
                fname=os.path.join(picture_dir, 'trajectory_error.png'),
                xlabel="Longitudinal position [m]",
                ylabel="Lateral position error [m]",
@@ -249,7 +250,7 @@ def plot_comparison(simu_dir, methods):
         #                        np.arctan(config.a_curve * config.k_curve * np.cos(config.k_curve * open_loop_state[:, 4]))))
         #     psi_error_data.append(open_loop_psi_error)
 
-        myplot(psi_error_data, num_methods , "xy",
+        idplot(psi_error_data, num_methods, "xy",
                fname=os.path.join(picture_dir, 'head_angle_error.png'),
                xlabel="Longitudinal position [m]",
                ylabel=r"Head angle error [$\degree$]",
@@ -273,7 +274,7 @@ def plot_comparison(simu_dir, methods):
         #     open_loop_control_tuple = (open_loop_state[1:, 4], 180 / np.pi * open_loop_control)
         #     control_plot_data.append(open_loop_control_tuple)
 
-        myplot(control_plot_data, num_methods, "xy",
+        idplot(control_plot_data, num_methods, "xy",
                fname=os.path.join(picture_dir, 'control.png'),
                xlabel="Longitudinal position [m]",
                ylabel=r"Steering angle [$\degree$]",
@@ -318,7 +319,7 @@ def plot_loss_decent_compare(comparison_dir):
         policy_loss.append(np.loadtxt(os.path.join(comparison_dir, policy_np)))
         p_scatter_data.append((range(len(policy_loss[i])), policy_loss[i]))
         v_scatter_data.append((range(len(value_loss[i])), np.log10(value_loss[i])))
-    myplot(v_scatter_data,3,"scatter",
+    idplot(v_scatter_data, 3, "scatter",
            fname=(os.path.join(comparison_dir, "p_loss.png")),
            xlabel="iteration",
            ylabel="log value loss",
@@ -333,7 +334,7 @@ def plot_loss_decent(log_dir):
     value_loss_tuple = (range(len(value_loss)), np.log10(value_loss))
     policy_loss_tuple = (range(len(policy_loss)), np.log10(policy_loss))
     loss = [value_loss_tuple, policy_loss_tuple]
-    myplot(loss, 2, "scatter",
+    idplot(loss, 2, "scatter",
            fname=(os.path.join(log_dir, "loss.png")),
            xlabel="iteration",
            ylabel="log value loss",
@@ -358,7 +359,7 @@ def adp_simulation_plot(simu_dir):
     trajectory = (state_history[:, -1], state_history[:, 0])
     figures_dir = simu_dir + "/Figures"
     os.makedirs(figures_dir, exist_ok=True)
-    myplot(trajectory, 1, "xy",
+    idplot(trajectory, 1, "xy",
            fname=os.path.join(figures_dir, 'adp_trajectory.png'),
            xlabel="longitudinal position [m]",
            ylabel="Lateral position [m]",
@@ -370,13 +371,13 @@ def adp_simulation_plot(simu_dir):
     omega = (state_history[:, -1], state_history[:, 3])
     data = [u_lat, psi, omega]
     legend=["$u_{lat}$", "$\psi$", "$\omega$"]
-    myplot(data, 3, "xy",
+    idplot(data, 3, "xy",
            fname=os.path.join(figures_dir, 'adp_other_state.png'),
            xlabel="longitudinal position [m]",
            legend=legend
            )
     control_history_plot = (state_history[1:, -1], 180 / np.pi * control_history)
-    myplot(control_history_plot, 1, "xy",
+    idplot(control_history_plot, 1, "xy",
            fname=os.path.join(figures_dir, 'adp_control.png'),
            xlabel="longitudinal position [m]",
            ylabel="steering angle [degree]"
