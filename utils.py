@@ -1,7 +1,6 @@
 from matplotlib import pyplot as plt
 import matplotlib.colors as mcolors
 from itertools import cycle
-from Config import GeneralConfig
 from idplot.config import default_cfg
 from idplot.utils import cm2inch
 import numpy as np
@@ -109,18 +108,13 @@ def idplot(data,
             if mode == "scatter":
                 plt.scatter(d[0], d[1], marker=".", s =5.,)
 
-    # plt.tick_params(labelsize=18)
     plt.tick_params(labelsize=default_cfg.tick_size)
     labels = ax.get_xticklabels() + ax.get_yticklabels()
     [label.set_fontname(default_cfg.tick_label_font) for label in labels]
-    # labels = ax.get_xticklabels() + ax.get_yticklabels()
-    # [label.set_fontname('Times New Roman') for label in labels]
-    # font = {'family': 'Times New Roman'} # , 'size': '18'
     if legend is not None:
         plt.legend(legend, loc=legend_loc, ncol=ncol, prop=default_cfg.legend_font)
-        # 'lower center'
-    plt.xlabel(xlabel, default_cfg.label_font) # , font
-    plt.ylabel(ylabel, default_cfg.label_font) # , font
+    plt.xlabel(xlabel, default_cfg.label_font)
+    plt.ylabel(ylabel, default_cfg.label_font)
     if xlim is not None:
         plt.xlim(xlim)
     if ylim is not None:
