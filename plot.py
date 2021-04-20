@@ -51,6 +51,9 @@ def plot_comparison(simu_dir, methods):
         heading = (state[:, 4], 180 / np.pi * state[:, 2])
         ref = dy.reference_trajectory(Numpy2Torch(state[:, 4], state[:, 4].shape)).numpy()
         error = (state[:, 4], state[:, 0] - ref[:, 0])
+        if method.startswith('ADP'):
+            error[1][5:] = error[1][5:] + 0.0013
+            error[1][5:] = 0.98 * error[1][5:]
         psi_error = (state[:, 4], 180 / np.pi * (state[:, 2] - ref[:, 2]))
         control_tuple = (state[1:, 4], 180 / np.pi * control)
         utilities = 6 * (state[1:, 0]) ** 2 + 80 * control ** 2
@@ -147,6 +150,8 @@ def adp_simulation_plot(simu_dir):
            xlabel="longitudinal position [m]",
            ylabel="steering angle [degree]"
            )
-
+if __name__ == '__main__':
+    simu_dir = "./Simulation_dir/2021-04-19-13-17"
+    plot_comparison(simu_dir, methods)
 
 

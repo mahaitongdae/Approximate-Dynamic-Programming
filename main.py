@@ -17,13 +17,13 @@ from Network import Actor, Critic
 from Train import Train
 from datetime import datetime
 from Simulation import simulation
-from plot_figure import adp_simulation_plot, plot_comparison
 from Config import GeneralConfig
 from utils import init_print
 
 
 # Parameters
 init_print()
+METHODS = ['MPC-10', 'ADP', 'OP']
 MAX_ITERATION = 10000        # max iterations
 LR_P = 6e-4                 # learning rate of policy net
 LR_V = 6e-3                # learning rate of value net
@@ -59,12 +59,9 @@ if TRAIN_FLAG == 1:
     print("************************** PRINT LOSS EVERY "+ str(print_iters) + "iterations ***************************")
     # train the network by policy iteration
     train = Train()
-    # train.agent_batch = vehicleDynamics.initialize_state()
     if LOAD_PARA_FLAG == 1:
-        train.agent_batch = torch.load(os.path.join(load_dir,'agent_buffer.pth'))
-        train.setInitState()
+        train.load_agent(load_dir)
     else:
-        # train.agent_batch = vehicleDynamics.initialize_state()
         train.initialize_state()
 
     while True:
@@ -94,10 +91,9 @@ if TRAIN_FLAG == 1:
 
 if SIMULATION_FLAG == 1:
     print("********************************* START SIMULATION *********************************")
-    methods = ['MPC','ADP']
     simu_dir = "./Simulation_dir/" + datetime.now().strftime("%Y-%m-%d-%H-%M")
     os.makedirs(simu_dir, exist_ok=True)
     if TRAIN_FLAG == 0:
-        simulation(methods, load_dir, simu_dir)
+        simulation(METHODS, load_dir, simu_dir)
     else:
-        simulation(methods, log_dir, simu_dir)
+        simulation(METHODS, log_dir, simu_dir)

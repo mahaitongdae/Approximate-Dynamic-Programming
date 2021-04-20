@@ -3,16 +3,18 @@ import numpy as np
 import torch
 import time
 import os
-from datetime import datetime
 from Network import Actor, Critic
 from Config import DynamicsConfig
-S_DIM = 4
-A_DIM = 1
+from datetime import datetime
 from Solver import Solver
 from utils import step_relative
-from plot import adp_simulation_plot, plot_comparison
+from plot import plot_comparison
+from Config import GeneralConfig
 
 def simulation(methods, log_dir, simu_dir):
+    config = GeneralConfig()
+    S_DIM = config.STATE_DIM
+    A_DIM = config.ACTION_DIM
     policy = Actor(S_DIM, A_DIM)
     value = Critic(S_DIM, A_DIM)
     config = DynamicsConfig()
@@ -53,34 +55,6 @@ def simulation(methods, log_dir, simu_dir):
                 cal_time += time.time() - time_start
                 u = np.array(control[0], dtype='float32').reshape(-1, config.ACTION_DIM)
                 u = torch.from_numpy(u)
-            # elif method == 'MPC-50':
-            #     x = state_r.tolist()[0]
-            #     time_start = time.time()
-            #     _, control = solver.mpcSolver(x, 10)
-            #     cal_time += time.time() - time_start
-            #     u = np.array(control[0], dtype='float32').reshape(-1, config.ACTION_DIM)
-            #     u = torch.from_numpy(u)
-            # elif method == 'MPC-5':
-            #     x = state_r.tolist()[0]
-            #     time_start = time.time()
-            #     _, control = solver.mpcSolver(x, 5)
-            #     cal_time += time.time() - time_start
-            #     u = np.array(control[0], dtype='float32').reshape(-1, config.ACTION_DIM)
-            #     u = torch.from_numpy(u)
-            # elif method == 'MPC-3':
-            #     x = state_r.tolist()[0]
-            #     time_start = time.time()
-            #     _, control = solver.mpcSolver(x, 3)
-            #     cal_time += time.time() - time_start
-            #     u = np.array(control[0], dtype='float32').reshape(-1, config.ACTION_DIM)
-            #     u = torch.from_numpy(u)
-            # elif method == 'MPC-2':
-            #     x = state_r.tolist()[0]
-            #     time_start = time.time()
-            #     _, control = solver.mpcSolver(x, 2)
-            #     cal_time += time.time() - time_start
-            #     u = np.array(control[0], dtype='float32').reshape(-1, config.ACTION_DIM)
-            #     u = torch.from_numpy(u)
             else:
                 u = np.array(op_control[i], dtype='float32').reshape(-1, config.ACTION_DIM)
                 u = torch.from_numpy(u)
@@ -102,36 +76,17 @@ def simulation(methods, log_dir, simu_dir):
             print(" MPC {}steps: {:.3f}".format(pred_steps, cal_time) + "s")
             np.savetxt(os.path.join(simu_dir, state_fname), state_history)
             np.savetxt(os.path.join(simu_dir, control_fname), control_history)
-        # elif method == 'MPC-50':
-        #     print(" MPC: {:.3f}".format(cal_time) + "s")
-        #     np.savetxt(os.path.join(simu_dir, 'structured_MPC_50_state.txt'), state_history)
-        #     np.savetxt(os.path.join(simu_dir, 'structured_MPC_50_control.txt'), control_history)
-        # elif method == 'MPC-5':
-        #     print(" MPC: {:.3f}".format(cal_time) + "s")
-        #     np.savetxt(os.path.join(simu_dir, 'structured_MPC_30_state.txt'), state_history)
-        #     np.savetxt(os.path.join(simu_dir, 'structured_MPC_30_control.txt'), control_history)
-        # elif method == 'MPC-3':
-        #     print(" MPC: {:.3f}".format(cal_time) + "s")
-        #     np.savetxt(os.path.join(simu_dir, 'structured_MPC_10_state.txt'), state_history)
-        #     np.savetxt(os.path.join(simu_dir, 'structured_MPC_10_control.txt'), control_history)
-        # elif method == 'MPC-2':
-        #     print(" MPC: {:.3f}".format(cal_time) + "s")
-        #     np.savetxt(os.path.join(simu_dir, 'structured_MPC_2_state.txt'), state_history)
-        #     np.savetxt(os.path.join(simu_dir, 'structured_MPC_2_control.txt'), control_history)
 
         else:
             np.savetxt(os.path.join(simu_dir, 'Open_loop_state.txt'), state_history)
 
-    # adp_simulation_plot(simu_dir)
     plot_comparison(simu_dir, methods)
 
 
 
 if __name__ == '__main__':
-    # log_dir = "./Results_dir/2020-10-09-14-42-10000"
-    methods = ['MPC-3','MPC-5','MPC-10','ADP','OP']
-    # simu_dir = "./Simulation_dir/" + datetime.now().strftime("%Y-%m-%d-%H-%M")
-    # os.makedirs(simu_dir, exist_ok=True)
-    # simulation(methods,log_dir,simu_dir)
-    simu_dir = "./Simulation_dir/2021-04-19-13-17"
-    plot_comparison(simu_dir, methods)
+    LOG_DIR = "./Results_dir/2020-10-09-14-42-10000"
+    METHODS = ['MPC-3','MPC-5','MPC-10','ADP','OP']
+    simu_dir = "./Simulation_dir/" + datetime.now().strftime("%Y-%m-%d-%H-%M")
+    os.makedirs(simu_dir, exist_ok=True)
+    simulation(METHODS, LOG_DIR, simu_dir)

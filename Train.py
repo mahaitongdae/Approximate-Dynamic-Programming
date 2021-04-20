@@ -41,8 +41,9 @@ class Train(DynamicsConfig):
         self.agent_batch[:, 0:4] = self.state_batch + init_ref
         self.init_state = self.agent_batch
 
-    def setInitState(self):
+    def load_agent(self, load_dir):
         # 0.6,0.4,0.15,0.1
+        self.agent_batch = torch.load(os.path.join(load_dir, 'agent_buffer.pth'))
         state_batch = self.state_batch.detach().clone()
         agent_batch = self.agent_batch.detach().clone()
         state_batch[:, 0] = torch.normal(0.0, 0.3, [self.BATCH_SIZE, ])
