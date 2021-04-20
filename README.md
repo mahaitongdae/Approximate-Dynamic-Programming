@@ -3,7 +3,9 @@
 Code demo more vehicle tracking control
 Algorithms: Approximate Dynamic Programming, Model Predictive Control
 
-![images](road.png)
+<div align=center>
+<img src="road.png" width = 50%/>
+</div>
 
 ## Getting Started
 
