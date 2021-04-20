@@ -16,7 +16,7 @@
 ## Directory Structure
 
 ```
-reinforcement-learning-python
+Approximate-Dynamic-Programming
 │  main.py - To illustrate usage
 │  plot.py - To plot comparison between ADP and MPC
 │  train.py - To execute PEV and PIM
