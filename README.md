@@ -1,7 +1,8 @@
-# REINFORCEMENT LEARNING AND CONTROL
+# Vehicle Tracking Control
 
-Code demo more vehicle tracking control
-Algorithms: Approximate Dynamic Programming, Model Predictive Control
+- Code demo for Chpater 8, Reinforcement Learning and Control.
+
+- Methods: Approximate Dynamic Programming, Model Predictive Control
 
 <div align=center>
 <img src="road.png" width = 50%/>
