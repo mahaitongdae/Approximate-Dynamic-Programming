@@ -49,3 +49,11 @@ class DynamicsConfig(GeneralConfig):
     psi_range = 1.3
     beta_range = 1.0
 
+class PlotConfig(object):
+    fig_size = (8.5, 6.5)
+    dpi = 300
+    pad = 0.2
+    tick_size = 8
+    legend_font = {'family': 'Times New Roman', 'size': '8', 'weight': 'normal'}
+    label_font = {'family': 'Times New Roman', 'size': '9', 'weight': 'normal'}
+    tick_label_font = 'Times New Roman'

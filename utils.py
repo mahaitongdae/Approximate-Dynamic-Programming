@@ -1,10 +1,16 @@
 from matplotlib import pyplot as plt
 import matplotlib.colors as mcolors
 from itertools import cycle
-from idplot.config import default_cfg
-from idplot.utils import cm2inch
+from config import PlotConfig
 import numpy as np
 import torch
+
+def cm2inch(*tupl):
+    inch = 2.54
+    if isinstance(tupl[0], tuple):
+        return tuple(i/inch for i in tupl[0])
+    else:
+        return tuple(i/inch for i in tupl)
 
 def smooth(data, a=0.5):
     data = np.array(data).reshape(-1, 1)
@@ -71,8 +77,8 @@ def idplot(data,
         color_list = [next(tableau_colors) for _ in range(figure_num)]
 
     l = 5
-    fig_size = (default_cfg.fig_size * figsize_scalar, default_cfg.fig_size * figsize_scalar)
-    _, ax = plt.subplots(figsize=cm2inch(*fig_size), dpi=default_cfg.dpi)
+    fig_size = (PlotConfig.fig_size * figsize_scalar, PlotConfig.fig_size * figsize_scalar)
+    _, ax = plt.subplots(figsize=cm2inch(*fig_size), dpi=PlotConfig.dpi)
     if figure_num == 1:
         data = [data]
 
@@ -103,20 +109,22 @@ def idplot(data,
             if mode == "scatter":
                 plt.scatter(d[0], d[1], marker=".", s =5.,)
 
-    plt.tick_params(labelsize=default_cfg.tick_size)
+    plt.tick_params(labelsize=PlotConfig.tick_size)
     labels = ax.get_xticklabels() + ax.get_yticklabels()
-    [label.set_fontname(default_cfg.tick_label_font) for label in labels]
+    [label.set_fontname(PlotConfig.tick_label_font) for label in labels]
     if legend is not None:
-        plt.legend(legend, loc=legend_loc, ncol=ncol, prop=default_cfg.legend_font)
-    plt.xlabel(xlabel, default_cfg.label_font)
-    plt.ylabel(ylabel, default_cfg.label_font)
+        plt.legend(legend, loc=legend_loc, ncol=ncol, prop=PlotConfig.legend_font)
+    plt.xlabel(xlabel, PlotConfig.label_font)
+    plt.ylabel(ylabel, PlotConfig.label_font)
     if xlim is not None:
         plt.xlim(xlim)
     if ylim is not None:
         plt.ylim(ylim)
-    plt.tight_layout(pad=default_cfg.pad)
+    plt.tight_layout(pad=PlotConfig.pad)
 
     if fname is None:
         plt.show()
     else:
         plt.savefig(fname)
+
+

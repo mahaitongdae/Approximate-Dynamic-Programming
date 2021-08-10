@@ -28,7 +28,7 @@ print(intro)
 METHODS = ['MPC-10', # MPC-"prediction steps of MPC",
            'ADP',    # Approximate dynamic programming,
            'OP']     # Open-loop
-MAX_ITERATION = 10000        # max iterations
+MAX_ITERATION = 1000        # max iterations
 LR_P = 6e-4                  # learning rate of policy net
 LR_V = 6e-3                  # learning rate of value net
 
