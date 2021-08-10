@@ -6,7 +6,7 @@
     OCP example for lane keeping problem in a circle road
 
     [Method]
-    Open loop solution
+    Model predictive control
 
 """
 from  casadi import *
@@ -129,14 +129,6 @@ class Solver(DynamicsConfig):
             else:
                 lbw += [-inf, -20, -pi, -20, -inf]
                 ubw += [inf, 20, pi, 20, inf]
-            # lbw += [-inf, -inf, -inf, -inf, -inf]
-            # ubw += [inf, inf, inf, inf, inf]
-
-
-            # Cost function
-            # F_cost = Function('F_cost', [x, u], [0.1 * (x[0] - ref[0]) ** 2
-            #                                      + 0.1 * (x[2] - ref[2]) ** 2
-            #                                      + 0.001 * u[0] ** 2])
             F_cost = Function('F_cost', [x, u], [0.1 * (x[0] - self.a_curve * sin(self.k_curve * x[4])) ** 2
                                                  + 0.1 * (x[2] - arctan(
                 self.a_curve * self.k_curve * cos(self.k_curve * x[4]))) ** 2
