@@ -1,9 +1,9 @@
 import numpy as np
 import os
-from Config import DynamicsConfig
-from utils import idplot, Numpy2Torch
+from config import DynamicsConfig
+from utils import idplot, numpy2torch
 
-import Dynamics
+import dynamics
 S_DIM = 4
 A_DIM = 1
 
@@ -30,7 +30,7 @@ def plot_comparison(simu_dir, methods):
     psi_error_data = []
     control_plot_data = []
     utilities_data = []
-    dy = Dynamics.VehicleDynamics()
+    dy = dynamics.VehicleDynamics()
 
     def load_data(method):
         if method.startswith('MPC'):
@@ -49,7 +49,7 @@ def plot_comparison(simu_dir, methods):
             raise KeyError('invalid methods')
         trajectory = (state[:, 4], state[:, 0])
         heading = (state[:, 4], 180 / np.pi * state[:, 2])
-        ref = dy.reference_trajectory(Numpy2Torch(state[:, 4], state[:, 4].shape)).numpy()
+        ref = dy.reference_trajectory(numpy2torch(state[:, 4], state[:, 4].shape)).numpy()
         error = (state[:, 4], state[:, 0] - ref[:, 0])
         if method.startswith('ADP'):
             error[1][5:] = error[1][5:] + 0.0013

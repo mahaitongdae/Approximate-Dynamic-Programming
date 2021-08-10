@@ -10,9 +10,9 @@
 
 """
 from  casadi import *
-from Config import DynamicsConfig
+from config import DynamicsConfig
 import math
-from Dynamics import VehicleDynamics
+from dynamics import VehicleDynamics
 import matplotlib.pyplot as plt
 
 class Solver(DynamicsConfig):

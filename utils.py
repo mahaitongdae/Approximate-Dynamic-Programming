@@ -12,7 +12,7 @@ def smooth(data, a=0.5):
         data[ind + 1, 0] = data[ind, 0] * (1-a) + data[ind + 1, 0] * a
     return data
 
-def Numpy2Torch(input,size):
+def numpy2torch(input, size):
     """
 
     Parameters

@@ -8,16 +8,16 @@
     [Method]
     Approximate dynamic programming with structured policy
 
-    """
-import Dynamics
+"""
+import dynamics
 import numpy as np
 import torch
 import os
-from Network import Actor, Critic
-from Train import Train
+from network import Actor, Critic
+from train import Train
 from datetime import datetime
-from Simulation import simulation
-from Config import GeneralConfig
+from simulation import simulation
+from config import GeneralConfig
 from utils import init_print
 
 
@@ -45,7 +45,7 @@ torch.manual_seed(0)
 config = GeneralConfig()
 policy = Actor(config.STATE_DIM, config.ACTION_DIM, lr=LR_P)
 value = Critic(config.STATE_DIM, 1, lr=LR_V)
-vehicleDynamics = Dynamics.VehicleDynamics()
+vehicleDynamics = dynamics.VehicleDynamics()
 state_batch = vehicleDynamics.initialize_state()
 
 # Training

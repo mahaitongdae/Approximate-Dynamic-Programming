@@ -1,7 +1,7 @@
 from __future__ import print_function
 import torch
 import numpy as np
-from Config import DynamicsConfig
+from config import DynamicsConfig
 import matplotlib.pyplot as plt
 import math
 

@@ -2,8 +2,8 @@ import numpy as np
 import torch
 import os
 from matplotlib import pyplot as plt
-from Config import GeneralConfig, DynamicsConfig
-from Dynamics import VehicleDynamics
+from config import GeneralConfig, DynamicsConfig
+from dynamics import VehicleDynamics
 from utils import step_relative
 
 
@@ -23,6 +23,7 @@ class Train(DynamicsConfig):
         self.value_loss = np.empty([0, 1])
         self.policy_loss = np.empty([0, 1])
         self.dynamics = VehicleDynamics()
+        self.equilibrium_state = torch.tensor([[0.0, 0.0, 0.0, 0.0]])
 
         for i in range(self.FORWARD_STEP):
             self.u_forward.append([])
@@ -31,7 +32,6 @@ class Train(DynamicsConfig):
             self.x_forward.append([])
 
     def initialize_state(self):
-        # 0.6, 0.4, 0.15, 0.1
         self.state_batch[:, 0] = torch.normal(0.0, 0.6, [self.BATCH_SIZE, ])
         self.state_batch[:, 1] = torch.normal(0.0, 0.4, [self.BATCH_SIZE, ])
         self.state_batch[:, 2] = torch.normal(0.0, 0.15, [self.BATCH_SIZE, ])
@@ -42,7 +42,6 @@ class Train(DynamicsConfig):
         self.init_state = self.agent_batch
 
     def load_agent(self, load_dir):
-        # 0.6,0.4,0.15,0.1
         self.agent_batch = torch.load(os.path.join(load_dir, 'agent_buffer.pth'))
         state_batch = self.state_batch.detach().clone()
         agent_batch = self.agent_batch.detach().clone()
@@ -144,12 +143,6 @@ class Train(DynamicsConfig):
                                                                                         self.u_forward[i])
                 ref_state_next = self.x_forward[i + 1][:, 0:4] - reference
                 self.L_forward[i] = dynamics.utility(ref_state_next, self.u_forward[i])
-                # # self.u_forward[i] = policy.forward(self.x_forward[i][:, 0:4])
-                # self.state_batch = dynamics.relative_state(self.x_forward[i])
-                # self.u_forward[i] = policy.forward(self.state_batch)
-                # # self.x_forward[i + 1], _, self.L_forward[i],_, _, _, _ = dynamics.step(self.x_forward[i], self.u_forward[i])
-                # self.x_forward[i + 1], self.state_batch_next  = step_relative(dynamics, self.x_forward[i], self.u_forward[i])
-                # self.L_forward[i] = dynamics.utility(self.state_batch_next, self.u_forward[i])
         self.agent_batch_next = self.x_forward[-1]
         self.state_batch_next = self.agent_batch_next[:, 0:4] - reference
         self.value_next = value.forward(self.state_batch_next)
@@ -159,12 +152,10 @@ class Train(DynamicsConfig):
         self.sum_utility = torch.sum(self.utility,0)
         target_value = self.sum_utility.detach() + self.value_next.detach()
         value_now = value.forward(self.state_batch)
-        equilibrium_state = torch.tensor([[0.0, 0.0, 0.0, 0.0]])
-        value_equilibrium = value.forward(equilibrium_state)
+        value_equilibrium = value.forward(self.equilibrium_state)
         value_loss = 1 / 2 * torch.mean(torch.pow((target_value - value_now), 2)) \
                      + 10 * torch.pow(value_equilibrium, 2)
         self.state_batch.requires_grad_(False)
-        # for i in range(1):
         value.zero_grad()
         value_loss.backward()
         value.opt.step()

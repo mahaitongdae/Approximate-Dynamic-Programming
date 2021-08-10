@@ -5,7 +5,7 @@
 - Methods: Approximate Dynamic Programming, Model Predictive Control
 
 <div align=center>
-<img src="road.png" width = 50%/>
+<img src="utils/road.png" width = 50%/>
 </div>
 
 ## Requirements
@@ -18,7 +18,7 @@
 ## Getting Started
 
 - To train an agent, follow the example code in `main.py` and tune the parameters. Change `METHODS` variable for adjusting the methods to compare in simulation stage.
-- Simulations will automatically executed after the training is finished. To separately start a simulation from a trained results and compare the performance between ADP and MPC, run `Simulation.py`. Change `LOG_DIR` variable to set the loaded results.
+- Simulations will automatically executed after the training is finished. To separately start a simulation from a trained results and compare the performance between ADP and MPC, run `simulation.py`. Change `LOG_DIR` variable to set the loaded results.
 
 ## Directory Structure
 
@@ -27,10 +27,11 @@ Approximate-Dynamic-Programming
 │  main.py - Main script
 │  plot.py - To plot comparison between ADP and MPC
 │  train.py - To execute PEV and PIM
-│  Dynamics.py - Vehicle model
-│  Network.py - Network structure
-│  Solver.py - Solvers for MPC using CasADi
-│  Config.py - Configurations about training and vehicle model
+│  dynamics.py - Vehicle model
+│  network.py - Network structure
+│  solver.py - Solvers for MPC using CasADi
+│  config.py - Configurations about training and vehicle model
+│  simulation.py - Run experiment to compare ADP and MPC
 │  readme.md
 │  requirements.txt
 │

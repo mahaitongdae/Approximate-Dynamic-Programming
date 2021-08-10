@@ -1,18 +1,27 @@
-import Dynamics
+import dynamics
 import numpy as np
 import torch
 import time
 import os
-from Network import Actor, Critic
-from Config import DynamicsConfig
+from network import Actor, Critic
+from config import DynamicsConfig
 from datetime import datetime
-from Solver import Solver
+from solver import Solver
 from utils import step_relative
 from plot import plot_comparison
-from Config import GeneralConfig
+from config import GeneralConfig
 
 def simulation(methods, log_dir, simu_dir):
+    '''
 
+    Args:
+        methods: list, methods to simulate
+        log_dir: str, name of log dir
+        simu_dir: str, name of log dir
+
+    Returns:
+
+    '''
     config = GeneralConfig()
     S_DIM = config.STATE_DIM
     A_DIM = config.ACTION_DIM
@@ -23,7 +32,7 @@ def simulation(methods, log_dir, simu_dir):
     load_dir = log_dir
     policy.load_parameters(load_dir)
     value.load_parameters(load_dir)
-    statemodel_plt = Dynamics.VehicleDynamics()
+    statemodel_plt = dynamics.VehicleDynamics()
     plot_length = config.SIMULATION_STEPS
 
     # Open-loop reference
