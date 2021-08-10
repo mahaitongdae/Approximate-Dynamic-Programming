@@ -12,6 +12,7 @@ from plot import plot_comparison
 from Config import GeneralConfig
 
 def simulation(methods, log_dir, simu_dir):
+
     config = GeneralConfig()
     S_DIM = config.STATE_DIM
     A_DIM = config.ACTION_DIM

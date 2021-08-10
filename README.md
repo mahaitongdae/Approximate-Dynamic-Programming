@@ -24,7 +24,7 @@
 
 ```
 Approximate-Dynamic-Programming
-│  main.py - To illustrate usage
+│  main.py - Main script
 │  plot.py - To plot comparison between ADP and MPC
 │  train.py - To execute PEV and PIM
 │  Dynamics.py - Vehicle model

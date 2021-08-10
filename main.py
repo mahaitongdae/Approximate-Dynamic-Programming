@@ -22,15 +22,19 @@ from utils import init_print
 
 
 # Parameters
-init_print()
-METHODS = ['MPC-10', 'ADP', 'OP']
+intro = 'DEMO OF CHPATER 8,  REINFORCEMENT LEARNING AND CONTROL\n'+ \
+                'APPROXIMATE DYNAMIC PROGRMMING FOR LANE KEEPING TASK \n'
+print(intro)
+METHODS = ['MPC-10', # MPC-"prediction steps of MPC",
+           'ADP',    # Approximate dynamic programming,
+           'OP']     # Open-loop
 MAX_ITERATION = 10000        # max iterations
-LR_P = 6e-4                 # learning rate of policy net
-LR_V = 6e-3                # learning rate of value net
+LR_P = 6e-4                  # learning rate of policy net
+LR_V = 6e-3                  # learning rate of value net
 
 # tasks
 TRAIN_FLAG = 1
-LOAD_PARA_FLAG = 1
+LOAD_PARA_FLAG = 0
 SIMULATION_FLAG = 1
 
 # Set random seed

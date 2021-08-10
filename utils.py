@@ -6,11 +6,6 @@ from idplot.utils import cm2inch
 import numpy as np
 import torch
 
-def init_print():
-    intro = 'DEMO OF CHPATER 8,  REINFORCEMENT LEARNING AND CONTROL\n'+ \
-                'APPROXIMATE DYNAMIC PROGRMMING FOR LANE KEEPING TASK \n'
-    print(intro)
-
 def smooth(data, a=0.5):
     data = np.array(data).reshape(-1, 1)
     for ind in range(data.shape[0] - 1):
