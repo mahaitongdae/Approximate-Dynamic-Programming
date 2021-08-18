@@ -90,8 +90,8 @@ def simulation(methods, log_dir, simu_dir):
         else:
             np.savetxt(os.path.join(simu_dir, 'Open_loop_state.txt'), state_history)
 
-    plot_comparison(simu_dir, methods)
-    plot_ref_and_state(log_dir, simu_dir, ref='pos')
+    # plot_comparison(simu_dir, methods)
+    # plot_ref_and_state(log_dir, simu_dir, ref='pos')
     plot_ref_and_state(log_dir, simu_dir, ref='angle')
 
 if __name__ == '__main__':

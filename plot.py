@@ -180,9 +180,9 @@ def plot_ref_and_state(log_dir, simu_dir, ref='angle', figsize_scalar=1, ms_size
     statemodel_plt = dynamics.VehicleDynamics()
 
     # Open-loop reference
-    x_init = [1.0, 0.0, 0.0, 0.0, 15 * np.pi]
+    x_init = [1.01, 0.0, 0.0, 0.0, 15 * np.pi]
     index = 0 if ref == 'pos' else 2
-    for step in [3,4,5]:
+    for step in [1]:
         cal_time = 0
         state = torch.tensor([x_init])
         state.requires_grad_(False)
@@ -200,7 +200,7 @@ def plot_ref_and_state(log_dir, simu_dir, ref='angle', figsize_scalar=1, ms_size
         for i in range(step): # plot_length
             x = state_r.tolist()[0]
             time_start = time.time()
-            state_r_predict, control = solver.mpcSolver(x, 10)
+            state_r_predict, control = solver.mpcSolver(x, 30)
             cal_time += time.time() - time_start
             u = np.array(control[0], dtype='float32').reshape(-1, config.ACTION_DIM)
             u = torch.from_numpy(u)
@@ -213,30 +213,32 @@ def plot_ref_and_state(log_dir, simu_dir, ref='angle', figsize_scalar=1, ms_size
             state_r_history = np.append(state_r_history, np.expand_dims(state_r_predict[0], axis=0), axis=0)
             state_history.append(state_predict[0])
             if i < step - 1:
-                plt.plot(state_r_predict[:, -1], state_predict[:, index], linestyle='--', marker='D', color='deepskyblue', ms=ms_size)
-                plt.plot(state_r_predict[:, -1], ref_predict[:, index], linestyle='--', color='grey', marker='D', ms=ms_size)
+                plt.plot(state_predict[:, 0], state_predict[:, index], linestyle='--', marker='D', color='deepskyblue', ms=ms_size)
+                plt.plot(ref_predict[:, 0], ref_predict[:, index], linestyle='--', color='red', marker='o', ms=2 * ms_size)
             else:
-                plt.plot(state_r_predict[:, -1], state_predict[:, index], linestyle='--', label='Predictive trajectory', color='deepskyblue', marker='D', ms=ms_size)
-                plt.plot(state_r_predict[:, -1], ref_predict[:, index], linestyle='--', color='grey',label='Predictive reference', marker='D', ms=ms_size)
+                plt.plot(state_predict[:, 0], state_predict[:, index], linestyle='--', label='Virtual traj', color='deepskyblue', marker='D', ms=ms_size)
+                plt.plot(ref_predict[:, 0], ref_predict[:, index], linestyle='--', color='red',label='Ref point', marker='o', ms=2 * ms_size)
 
         ref_history = np.array(ref_history)
         state_history = np.array(state_history)
-        plt.plot(state_r_history[1:, -1], state_history[:, index], color='blue', label='Real trajectory', marker='1', ms=ms_size)
-        plt.plot(state_r_history[1:, -1], ref_history[:, index], linestyle='-.', color='black', label='Real reference',
-                 marker='1', ms=ms_size)
+        # plt.plot(state_r_history[1:, 0], state_history[:, index], color='blue', label='Real trajectory', marker='1', ms=ms_size)
+        # plt.plot(state_r_history[1:, 0], ref_history[:, index], linestyle='-.', color='black', label='Real reference',
+        #          marker='1', ms=ms_size)
 
         plt.tick_params(labelsize=PlotConfig.tick_size)
         labels = ax.get_xticklabels() + ax.get_yticklabels()
         [label.set_fontname(PlotConfig.tick_label_font) for label in labels]
         plt.legend(loc='best', prop=PlotConfig.legend_font)
-        plt.xlim([47, 57])
+        # plt.xlim([47, 57])
         if ref == 'pos':
             plt.ylim([0.970, 1.002])
-        elif ref == 'angle':
-            plt.ylim([-0.006, 0.0005])
+        # elif ref == 'angle':
+            # plt.ylim([-0.006, 0.0005])
         figures_dir = simu_dir + "/Figures"
         os.makedirs(figures_dir, exist_ok=True)
         fig_name = 'reference_' + ref + '_' + str(step) + '.png'
         fig_path = os.path.join(figures_dir, fig_name)
+        plt.xlabel("Lateral position [m]")
+        plt.ylabel("Heading angle [deg]")
         plt.savefig(fig_path)
 
