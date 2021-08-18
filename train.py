@@ -186,7 +186,6 @@ class Train(DynamicsConfig):
         """
         np.savetxt(os.path.join(log_dir, "value_loss.txt"), self.value_loss)
         np.savetxt(os.path.join(log_dir, "policy_loss.txt"), self.policy_loss)
-        torch.save(self.agent_batch, os.path.join(log_dir, "agent_buffer.pth"))
 
     def print_loss_figure(self, iteration, log_dir):
         """
