@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 import matplotlib.colors as mcolors
 from itertools import cycle
-from config import PlotConfig
+from config import PlotConfig, DynamicsConfig
 import numpy as np
 import torch
 
@@ -53,8 +53,19 @@ def step_relative(statemodel, state, u):
     state_r_next_bias[:, [0, 2]] = state_next[:, [0, 2]]            # y psi with reference update by absolute value
     x_ref_next = statemodel.reference_trajectory(state_next[:, -1])
     state_r_next[:, 0:4] = state_r_next_bias[:, 0:4] - x_ref_next
-    return state_next.clone().detach(), state_r_next.clone().detach()
+    return state_next.clone().detach(), state_r_next.clone().detach(), x_ref.detach().clone()
 
+def recover_absolute_state(state_r_predict, x_ref, length=None):
+    if length is None:
+        length = state_r_predict.shape[0]
+    c = DynamicsConfig()
+    ref_predict = [x_ref]
+    for i in range(length-1):
+        ref_t = np.copy(ref_predict[-1])
+        ref_t[0] += c.u * c.Ts * np.tan(x_ref[2])
+        ref_predict.append(ref_t)
+    state = state_r_predict[:, 0:4] + ref_predict
+    return state, np.array(ref_predict)
 
 def idplot(data,
            figure_num=1,

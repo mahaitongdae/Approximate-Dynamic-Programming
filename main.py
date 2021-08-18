@@ -18,7 +18,6 @@ from train import Train
 from datetime import datetime
 from simulation import simulation
 from config import GeneralConfig
-from utils import init_print
 
 
 # Parameters
@@ -63,10 +62,6 @@ if TRAIN_FLAG == 1:
     print("************************** PRINT LOSS EVERY "+ str(print_iters) + "iterations ***************************")
     # train the network by policy iteration
     train = Train()
-    if LOAD_PARA_FLAG == 1:
-        train.load_agent(load_dir)
-    else:
-        train.initialize_state()
 
     while True:
         train.update_state(policy, vehicleDynamics)
@@ -84,7 +79,7 @@ if TRAIN_FLAG == 1:
         # save parameters, run simulation and plot figures
         if iteration_index == MAX_ITERATION:
             # ==================== Set log path ====================
-            print("********************************* FINISH TRAINING **********************************")
+            #
             log_dir = "./Results_dir/" + datetime.now().strftime("%Y-%m-%d-%H-%M-" + str(iteration_index))
             os.makedirs(log_dir, exist_ok=True)
             value.save_parameters(log_dir)

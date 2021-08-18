@@ -30,29 +30,17 @@ class Train(DynamicsConfig):
             self.L_forward.append([])
         for i in range(self.FORWARD_STEP+1):
             self.x_forward.append([])
+        self.initialize_state()
 
     def initialize_state(self):
-        self.state_batch[:, 0] = torch.normal(0.0, 0.6, [self.BATCH_SIZE, ])
-        self.state_batch[:, 1] = torch.normal(0.0, 0.4, [self.BATCH_SIZE, ])
-        self.state_batch[:, 2] = torch.normal(0.0, 0.15, [self.BATCH_SIZE, ])
-        self.state_batch[:, 3] = torch.normal(0.0, 0.1, [self.BATCH_SIZE, ])
+        self.state_batch[:, 0] = torch.normal(0.0, 0.3, [self.BATCH_SIZE, ])
+        self.state_batch[:, 1] = torch.normal(0.0, 0.2, [self.BATCH_SIZE, ])
+        self.state_batch[:, 2] = torch.normal(0.0, 0.1, [self.BATCH_SIZE, ])
+        self.state_batch[:, 3] = torch.normal(0.0, 0.06, [self.BATCH_SIZE, ])
         self.agent_batch[:, 4] = torch.linspace(0.0, np.pi, self.BATCH_SIZE)
         init_ref = self.dynamics.reference_trajectory(self.agent_batch[:, 4])
         self.agent_batch[:, 0:4] = self.state_batch + init_ref
         self.init_state = self.agent_batch
-
-    def load_agent(self, load_dir):
-        self.agent_batch = torch.load(os.path.join(load_dir, 'agent_buffer.pth'))
-        state_batch = self.state_batch.detach().clone()
-        agent_batch = self.agent_batch.detach().clone()
-        state_batch[:, 0] = torch.normal(0.0, 0.3, [self.BATCH_SIZE, ])
-        state_batch[:, 1] = torch.normal(0.0, 0.2, [self.BATCH_SIZE, ])
-        state_batch[:, 2] = torch.normal(0.0, 0.07, [self.BATCH_SIZE, ])
-        state_batch[:, 3] = torch.normal(0.0, 0.05, [self.BATCH_SIZE, ])
-        agent_batch[:, 4] = torch.linspace(0.0, np.pi, self.BATCH_SIZE)
-        init_ref = self.dynamics.reference_trajectory(agent_batch[:, 4])
-        agent_batch[:, 0:4] = state_batch + init_ref
-        self.init_state = agent_batch
 
     def check_done(self, state):
         """
@@ -158,7 +146,9 @@ class Train(DynamicsConfig):
         self.state_batch.requires_grad_(False)
         value.zero_grad()
         value_loss.backward()
+        torch.nn.utils.clip_grad_norm_(value.parameters(), 10.0)
         value.opt.step()
+        value.scheduler.step()
         self.value_loss = np.append(self.value_loss, value_loss.detach().numpy())
         return value_loss.detach().numpy()
 
@@ -176,7 +166,9 @@ class Train(DynamicsConfig):
         #for i in range(1):
         policy.zero_grad()
         policy_loss.backward()
+        torch.nn.utils.clip_grad_norm_(policy.parameters(), 10.0)
         policy.opt.step()
+        policy.scheduler.step()
         self.policy_loss = np.append(self.policy_loss, policy_loss.detach().numpy())
         return policy_loss.detach().numpy()
 
