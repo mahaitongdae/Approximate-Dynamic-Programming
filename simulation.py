@@ -8,7 +8,7 @@ from config import DynamicsConfig
 from datetime import datetime
 from solver import Solver
 from utils import step_relative
-from plot import plot_comparison, plot_ref_and_state
+from plot import plot_comparison, plot_ref_and_state, plot_phase_plot
 from config import GeneralConfig
 
 def simulation(methods, log_dir, simu_dir):
@@ -51,7 +51,7 @@ def simulation(methods, log_dir, simu_dir):
         state_history = state.detach().numpy()
         control_history = []
 
-        print('\nCALCULATION TIME:')
+        if methods != 'OP': print('\nCALCULATION TIME:')
         for i in range(plot_length):
             if method == 'ADP':
                 time_start = time.time()
@@ -83,7 +83,7 @@ def simulation(methods, log_dir, simu_dir):
             pred_steps = method.split('-')[1]
             state_fname, control_fname = 'MPC_' + pred_steps + '_state.txt', \
                                        'MPC_' + pred_steps + '_control.txt'
-            print(" MPC {}steps: {:.3f}".format(pred_steps, cal_time) + "s")
+            print(" MPC {} steps: {:.3f}".format(pred_steps, cal_time) + "s")
             np.savetxt(os.path.join(simu_dir, state_fname), state_history)
             np.savetxt(os.path.join(simu_dir, control_fname), control_history)
 
@@ -93,6 +93,8 @@ def simulation(methods, log_dir, simu_dir):
     plot_comparison(simu_dir, methods)
     plot_ref_and_state(log_dir, simu_dir, ref='pos')
     plot_ref_and_state(log_dir, simu_dir, ref='angle')
+    plot_phase_plot(['MPC-50', 'MPC-10', 'MPC-5', 'ADP'], log_dir, simu_dir)
+
 
 if __name__ == '__main__':
     LOG_DIR = "./trained_results/2020-10-09-14-42-10000"

@@ -231,7 +231,7 @@ def plot_ref_and_state(log_dir, simu_dir, ref='angle', figsize_scalar=1, ms_size
         plt.legend(loc='best', prop=PlotConfig.legend_font)
         plt.xlim([47, 57])
         if ref == 'pos':
-            plt.ylim([0.970, 1.002])
+            plt.ylim([0.990, 1.002])
         elif ref == 'angle':
             plt.ylim([-0.006, 0.0005])
         figures_dir = simu_dir + "/Figures"
@@ -239,4 +239,95 @@ def plot_ref_and_state(log_dir, simu_dir, ref='angle', figsize_scalar=1, ms_size
         fig_name = 'reference_' + ref + '_' + str(step) + '.png'
         fig_path = os.path.join(figures_dir, fig_name)
         plt.savefig(fig_path)
+
+
+def plot_phase_plot(methods, log_dir, simu_dir, figsize_scalar=1, ms_size=2.0):
+    '''
+
+    Args:
+        log_dir: str, model directory.
+        simu_dir: str, simulation directory.
+        ref: 'pos' or 'angle', which state to plot.
+
+    Returns:
+
+    '''
+    config = GeneralConfig()
+    S_DIM = config.STATE_DIM
+    A_DIM = config.ACTION_DIM
+    policy = Actor(S_DIM, A_DIM)
+    value = Critic(S_DIM, A_DIM)
+    config = DynamicsConfig()
+    solver = Solver()
+    load_dir = log_dir
+    policy.load_parameters(load_dir)
+    value.load_parameters(load_dir)
+    statemodel_plt = dynamics.VehicleDynamics()
+
+    # Open-loop reference
+    x_init = [1.01, 0.0, 0.0, 0.0, 15 * np.pi]
+    index = 2
+    state = torch.tensor([x_init])
+    for step in range(16):
+        if step % 5 != 0:
+            state, state_r, x_ref = step_relative(statemodel_plt, state, u)
+            continue
+        cal_time = 0
+        state.requires_grad_(False)
+        x_ref = statemodel_plt.reference_trajectory(state[:, -1])
+        state_r = state.detach().clone()
+        state_r[:, 0:4] = state_r[:, 0:4] - x_ref
+
+        for i in range(1):  # plot_length
+            fig_size = (PlotConfig.fig_size * figsize_scalar, PlotConfig.fig_size * figsize_scalar)
+            _, ax = plt.subplots(figsize=cm2inch(*fig_size), dpi=PlotConfig.dpi)
+            for method in methods:
+                if method.startswith('ADP'):
+                    state_r_predict = []
+                    ref_state = state_r[:, 0:4]
+                    for virtual_step in range(50):
+                        u = policy.forward(ref_state)
+                        state, _, _, _, _, _, _ = statemodel_plt.step(state, u)
+                        ref_state = state.detach().clone()[:, 0:4] - x_ref
+                        state_r_predict.append(ref_state.numpy().squeeze())
+                    state_r_predict = np.array(state_r_predict)
+                    label = 'ADP'
+                    color = 'deepskyblue'
+
+
+                elif method.startswith('MPC'):
+                    pred_steps = int(method.split('-')[1])
+                    x = state_r.tolist()[0]
+                    time_start = time.time()
+                    state_r_predict, control = solver.mpcSolver(x, pred_steps)
+                    cal_time += time.time() - time_start
+                    u = np.array(control[0], dtype='float32').reshape(-1, config.ACTION_DIM)
+                    u = torch.from_numpy(u)
+                    label = 'MPC ' + str(pred_steps) + ' steps'
+                    color = 'red'
+                    # state_predict, ref_predict = recover_absolute_state(state_r_predict, x_ref.numpy().squeeze())
+
+                else: continue
+
+                plt.plot(state_r_predict[:, 0], state_r_predict[:, index], linestyle='--', label=label,
+                         marker='D', ms=ms_size)
+
+            plt.scatter([0], [0], color='red',
+                     label='Ref point', marker='o', s= 4 * ms_size)
+            plt.tick_params(labelsize=PlotConfig.tick_size)
+            labels = ax.get_xticklabels() + ax.get_yticklabels()
+            [label.set_fontname(PlotConfig.tick_label_font) for label in labels]
+            plt.legend(loc='best', prop=PlotConfig.legend_font)
+            figures_dir = simu_dir + "/Figures"
+            os.makedirs(figures_dir, exist_ok=True)
+            fig_name = 'phase_plot_' + str(step) + '.png'
+            fig_path = os.path.join(figures_dir, fig_name)
+            plt.xlabel("Lateral position [m]", PlotConfig.label_font)
+            plt.ylabel("Heading angle [deg]", PlotConfig.label_font)
+            plt.tight_layout(pad=PlotConfig.pad)
+            plt.savefig(fig_path)
+
+        state, state_r, x_ref = step_relative(statemodel_plt, state, u)
+
+
 

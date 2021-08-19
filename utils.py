@@ -62,7 +62,7 @@ def recover_absolute_state(state_r_predict, x_ref, length=None):
     ref_predict = [x_ref]
     for i in range(length-1):
         ref_t = np.copy(ref_predict[-1])
-        ref_t[0] += c.u * c.Ts * np.tan(x_ref[2])
+        # ref_t[0] += c.u * c.Ts * np.tan(x_ref[2])
         ref_predict.append(ref_t)
     state = state_r_predict[:, 0:4] + ref_predict
     return state, np.array(ref_predict)
