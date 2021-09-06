@@ -1,4 +1,16 @@
 """
+Copyright (c). All Rights Reserved.
+<Reinforcement Learning and Control> (Year 2020)
+Intelligent Driving Lab (iDLab), Tsinghua University
+
+by Shengbo Eben Li & Haitong Ma
+
+Description: Chapter 6: RL example for lane keeping problem in a curve road;
+             Approximate dynamic programming with structured policy
+
+Update Date: 2021-09-06, Haitong Ma: Rewrite code formats
+"""
+"""
     <Reinforcement Learning and Control>(Year 2020)
     by Shengbo Eben Li
         @ Intelligent Driving Lab, Tsinghua University

@@ -1,14 +1,16 @@
 """
-    <Reinforcement Learning and Control>(Year 2020)
-    by Shengbo Eben Li
-        @ Intelligent Driving Lab, Tsinghua University
+Copyright (c). All Rights Reserved.
+<Reinforcement Learning and Control> (Year 2020)
+Intelligent Driving Lab (iDLab), Tsinghua University
 
-    ADP example for lane keeping problem in a curve road
+by Shengbo Eben Li & Haitong Ma
 
-    [Method]
-    Approximate dynamic programming with structured policy
+Description: Chapter 6: RL example for lane keeping problem in a curve road;
+             Approximate dynamic programming with structured policy
 
+Update Date: 2021-09-06, Haitong Ma: Rewrite code formats
 """
+# =================== load package ====================
 import dynamics
 import numpy as np
 import torch
@@ -20,7 +22,7 @@ from simulation import simulation
 from config import GeneralConfig
 
 
-# Parameters
+# ============= Setting hyper-parameters ===============
 intro = 'DEMO OF CHPATER 8,  REINFORCEMENT LEARNING AND CONTROL\n'+ \
                 'APPROXIMATE DYNAMIC PROGRMMING FOR LANE KEEPING TASK \n'
 print(intro)
@@ -38,7 +40,7 @@ TRAIN_FLAG = 1
 LOAD_PARA_FLAG = 0
 SIMULATION_FLAG = 0
 
-# Set random seed
+# ============= Setting random seed ===============
 np.random.seed(0)
 torch.manual_seed(0)
 
@@ -49,7 +51,7 @@ value = Critic(config.STATE_DIM, 1, lr=LR_V)
 vehicleDynamics = dynamics.VehicleDynamics()
 state_batch = vehicleDynamics.initialize_state()
 
-# Training
+# =================== Training ===================
 iteration_index = 0
 if LOAD_PARA_FLAG == 1:
     print("********************************* LOAD PARAMETERS *********************************")
@@ -95,6 +97,7 @@ if TRAIN_FLAG == 1:
             if iteration_index == MAX_ITERATION:
                 break
 
+# =================== Simulation ===================
 if SIMULATION_FLAG == 1:
     print("********************************* START SIMULATION *********************************")
     simu_dir = "./Simulation_dir/" + datetime.now().strftime("%Y-%m-%d-%H-%M")
