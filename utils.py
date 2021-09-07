@@ -108,7 +108,7 @@ def idplot(data,
     if color_list is not None:
         for (i, d) in enumerate(data):
             if mode == "xy":
-                if i == l - 2:
+                if i == 0:
                     plt.plot(d[0], d[1], linestyle='-.', color=color_list[i])
                 elif i == l - 1:
                     plt.plot(d[0], d[1], linestyle='dotted', color=color_list[i])
@@ -121,7 +121,7 @@ def idplot(data,
     else:
         for (i, d) in enumerate(data):
             if mode == "xy":
-                if i == l - 2:
+                if i == 0:
                     plt.plot(d[0], d[1],  linestyle='-.')
                 elif i == l - 1:
                     plt.plot(d[0], d[1],  linestyle='dotted')

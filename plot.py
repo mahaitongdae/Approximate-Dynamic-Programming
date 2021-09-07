@@ -229,7 +229,7 @@ def plot_ref_and_state(log_dir, simu_dir, ref='angle', figsize_scalar=1, ms_size
                 plt.plot(state_r_predict[:, -1], ref_predict[:, index], linestyle='--', color='grey', marker='D', ms=ms_size)
             else:
                 plt.plot(state_r_predict[:, -1], state_predict[:, index], linestyle='--', label='Predictive trajectory', color='deepskyblue', marker='D', ms=ms_size)
-                plt.plot(state_r_predict[:, -1], ref_predict[:, index], linestyle='--', color='grey',label='Predictive reference', marker='D', ms=ms_size)
+                plt.plot(state_r_predict[:, -1], ref_predict[:, index], linestyle='--', color='grey', label='Predictive reference', marker='D', ms=ms_size)
 
         ref_history = np.array(ref_history)
         state_history = np.array(state_history)
