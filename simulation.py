@@ -97,7 +97,7 @@ def simulation(methods, log_dir, simu_dir):
 
 
 if __name__ == '__main__':
-    LOG_DIR = "./Results_dir/2021-09-06-17-21-10800"
+    LOG_DIR = "./Results_dir/2021-09-07-15-51-11000"
     METHODS = ['MPC-5', 'MPC-10', 'MPC-30', 'ADP', 'OP'] #
     simu_dir = "./Simulation_dir/" + datetime.now().strftime("%Y-%m-%d-%H-%M")
     os.makedirs(simu_dir, exist_ok=True)

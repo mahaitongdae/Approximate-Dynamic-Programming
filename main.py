@@ -39,8 +39,8 @@ LOAD_PARA_FLAG = 0
 SIMULATION_FLAG = 0
 
 # Set random seed
-np.random.seed(0)
-torch.manual_seed(0)
+np.random.seed(1)
+torch.manual_seed(1)
 
 # initialize policy and value net, model of vehicle dynamics
 config = GeneralConfig()

@@ -302,9 +302,9 @@ class Solver(DynamicsConfig):
                                                      + 80 * u[0] ** 2
                                                      + 0.3 * u[1] ** 2])
             else:
-                F_cost = Function('F_cost', [x, u], [0.04 * (x[0]) ** 2
+                F_cost = Function('F_cost', [x, u], [0.2 * (x[0]) ** 2
                                                      + 1 * (x[2]) ** 2
-                                                     + 1 * u[0] ** 2])
+                                                     + 5 * u[0] ** 2])
             J += F_cost(w[k * 2], w[k * 2 - 1])
             # J += F_cost(w[k * 3 - 1], w[k * 3 - 2])
 

@@ -294,5 +294,5 @@ class VehicleDynamics(DynamicsConfig):
         utility: tensor   shape: [BATCH_SIZE, ]
             utility, i.e. l(x,u)
         """
-        utility = 0.1 * torch.pow(state[:, 0], 2) + 1 * torch.pow(state[:, 2], 2) + 1 * torch.pow(control[:, 0], 2)
+        utility = 0.2 * torch.pow(state[:, 0], 2) + 1 * torch.pow(state[:, 2], 2) + 5 * torch.pow(control[:, 0], 2)
         return utility
