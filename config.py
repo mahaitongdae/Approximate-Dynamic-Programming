@@ -1,4 +1,5 @@
 from __future__ import print_function
+import numpy as np
 class GeneralConfig(object):
     BATCH_SIZE = 256
     DYNAMICS_DIM = 5
@@ -9,16 +10,14 @@ class GeneralConfig(object):
     GAMMA_D = 1
     RESET_ITERATION = 10000
 
-    NP = 50
-    NP_TOTAL = 500
-
     SIMULATION_STEPS = 500
+    NP_TOTAL = SIMULATION_STEPS+1
 
 
 class DynamicsConfig(GeneralConfig):
 
     nonlinearity = True
-    tire_model = 'Pacejka'    # Fiala, Pacejka, Linear
+    tire_model = 'Pacejka'    # Pacejka, Linear
     reference_traj = 'SIN'
 
     a = 1.14       # distance c.g.to front axle(m)
@@ -40,7 +39,7 @@ class DynamicsConfig(GeneralConfig):
     F_z1 = m * g * b / L    # Vertical force on front axle
     F_z2 = m * g * a / L    # Vertical force on rear axle
 
-    k_curve = 1/30          # curve shape of a * sin(kx)
+    k_curve = 1/30        # curve shape of a * sin(kx)
     a_curve = 1           # curve shape of a * sin(kx)
     psi_init = a_curve * k_curve # initial position of psi
 
@@ -48,6 +47,9 @@ class DynamicsConfig(GeneralConfig):
     y_range = 5
     psi_range = 1.3
     beta_range = 1.0
+
+    x_init_s = [0, 0.0, psi_init + 0 / 180 * np.pi, 0.0, 0.0]
+    x_init_pred = [-0.1, 0.0, psi_init + 3 / 180 * np.pi, 0.0, 0.0]
 
 class PlotConfig(object):
     fig_size = (8.5, 6.5)

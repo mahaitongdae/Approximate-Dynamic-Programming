@@ -1,3 +1,15 @@
+"""
+Copyright (c). All Rights Reserved.
+<Reinforcement Learning and Control> (Year 2020)
+Intelligent Driving Lab (iDLab), Tsinghua University
+
+by Shengbo Eben Li & Haitong Ma
+
+Description: Chapter 6: RL example for lane keeping problem in a curve road;
+             Approximate dynamic programming with structured policy
+
+Update Date: 2021-09-06, Haitong Ma: Rewrite code formats
+"""
 import os
 import numpy as np
 import torch
@@ -26,7 +38,7 @@ class Actor(nn.Module):
         )
         # initial optimizer
         self.opt = torch.optim.Adam(self.parameters(), lr=lr)
-        self.scheduler = torch.optim.lr_scheduler.StepLR(self.opt, 100, gamma=0.9, last_epoch=-1)
+        self.scheduler = torch.optim.lr_scheduler.StepLR(self.opt, 100, gamma=0.95, last_epoch=-1) # todo
         self._initialize_weights()
 
         # zeros state value
@@ -99,11 +111,11 @@ class Critic(nn.Module):
             nn.Linear(256, output_size),
             nn.ReLU()
         )
-        self._norm_matrix = 0.1 * torch.tensor([2, 5, 10, 10], dtype=torch.float32)
+        self._norm_matrix = 0.1 * torch.tensor([2, 5, 10, 10], dtype=torch.float32) # todo
 
         # initial optimizer
         self.opt = torch.optim.Adam(self.parameters(), lr=lr)
-        self.scheduler = torch.optim.lr_scheduler.StepLR(self.opt, 100, gamma=0.9, last_epoch=-1)
+        self.scheduler = torch.optim.lr_scheduler.StepLR(self.opt, 100, gamma=0.95, last_epoch=-1) # todo
         self._initialize_weights()
 
 

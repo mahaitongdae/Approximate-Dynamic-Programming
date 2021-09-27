@@ -1,3 +1,15 @@
+"""
+Copyright (c). All Rights Reserved.
+<Reinforcement Learning and Control> (Year 2020)
+Intelligent Driving Lab (iDLab), Tsinghua University
+
+by Shengbo Eben Li & Haitong Ma
+
+Description: Chapter 6: RL example for lane keeping problem in a curve road;
+             Approximate dynamic programming with structured policy
+
+Update Date: 2021-09-06, Haitong Ma: Rewrite code formats
+"""
 import numpy as np
 import torch
 import os
@@ -146,7 +158,7 @@ class Train(DynamicsConfig):
         self.state_batch.requires_grad_(False)
         value.zero_grad()
         value_loss.backward()
-        torch.nn.utils.clip_grad_norm_(value.parameters(), 10.0)
+        torch.nn.utils.clip_grad_norm_(value.parameters(), 10.0) # todo
         value.opt.step()
         value.scheduler.step()
         self.value_loss = np.append(self.value_loss, value_loss.detach().numpy())
@@ -166,7 +178,7 @@ class Train(DynamicsConfig):
         #for i in range(1):
         policy.zero_grad()
         policy_loss.backward()
-        torch.nn.utils.clip_grad_norm_(policy.parameters(), 10.0)
+        torch.nn.utils.clip_grad_norm_(policy.parameters(), 10.0) # todo
         policy.opt.step()
         policy.scheduler.step()
         self.policy_loss = np.append(self.policy_loss, policy_loss.detach().numpy())

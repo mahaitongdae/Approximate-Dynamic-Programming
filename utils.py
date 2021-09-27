@@ -1,3 +1,15 @@
+"""
+Copyright (c). All Rights Reserved.
+<Reinforcement Learning and Control> (Year 2020)
+Intelligent Driving Lab (iDLab), Tsinghua University
+
+by Shengbo Eben Li & Haitong Ma
+
+Description: Chapter 6: RL example for lane keeping problem in a curve road;
+             Approximate dynamic programming with structured policy
+
+Update Date: 2021-09-06, Haitong Ma: Rewrite code formats
+"""
 from matplotlib import pyplot as plt
 import matplotlib.colors as mcolors
 from itertools import cycle
@@ -6,6 +18,7 @@ import numpy as np
 import torch
 
 def cm2inch(*tupl):
+
     inch = 2.54
     if isinstance(tupl[0], tuple):
         return tuple(i/inch for i in tupl[0])
@@ -79,7 +92,8 @@ def idplot(data,
            xlim=None,
            ylim=None,
            ncol=1,
-           figsize_scalar=1):
+           figsize_scalar=1,
+           tight_layout=True):
     """
     plot figures
     """
@@ -96,7 +110,7 @@ def idplot(data,
     if color_list is not None:
         for (i, d) in enumerate(data):
             if mode == "xy":
-                if i == l - 2:
+                if i == 0:
                     plt.plot(d[0], d[1], linestyle='-.', color=color_list[i])
                 elif i == l - 1:
                     plt.plot(d[0], d[1], linestyle='dotted', color=color_list[i])
@@ -109,7 +123,7 @@ def idplot(data,
     else:
         for (i, d) in enumerate(data):
             if mode == "xy":
-                if i == l - 2:
+                if i == 0:
                     plt.plot(d[0], d[1],  linestyle='-.')
                 elif i == l - 1:
                     plt.plot(d[0], d[1],  linestyle='dotted')
@@ -131,7 +145,10 @@ def idplot(data,
         plt.xlim(xlim)
     if ylim is not None:
         plt.ylim(ylim)
-    plt.tight_layout(pad=PlotConfig.pad)
+    if tight_layout:
+        plt.tight_layout(pad=PlotConfig.pad)
+    else:
+        plt.tight_layout(pad=3*PlotConfig.pad)
 
     if fname is None:
         plt.show()

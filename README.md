@@ -10,10 +10,19 @@
 
 ## Requirements
 
-[PyTorch](https://pytorch.org/get-started/previous-versions/)  1.4.0
+[PyTorch](https://pytorch.org/get-started/previous-versions/)  1.6.0
+
+```
+conda install pytorch==1.6.0 torchvision==0.7.0 cpuonly -c pytorch
+```
 
 [CasADi](https://web.casadi.org/get/)
 
+```
+conda install -c conda-forge ipopt
+pip install casadi
+```
+Other packages in requirements.txt
 
 ## Getting Started
 

@@ -1,3 +1,15 @@
+"""
+Copyright (c). All Rights Reserved.
+<Reinforcement Learning and Control> (Year 2020)
+Intelligent Driving Lab (iDLab), Tsinghua University
+
+by Shengbo Eben Li & Haitong Ma
+
+Description: Chapter 6: RL example for lane keeping problem in a curve road;
+             Approximate dynamic programming with structured policy
+
+Update Date: 2021-09-06, Haitong Ma: Rewrite code formats
+"""
 from __future__ import print_function
 import torch
 import numpy as np
@@ -294,5 +306,5 @@ class VehicleDynamics(DynamicsConfig):
         utility: tensor   shape: [BATCH_SIZE, ]
             utility, i.e. l(x,u)
         """
-        utility = 0.05 * (10 * torch.pow(state[:, 0], 2) + 5 * torch.pow(state[:, 2], 2) + 5 * torch.pow(control[:, 0], 2))
+        utility = 0.2 * torch.pow(state[:, 0], 2) + 1 * torch.pow(state[:, 2], 2) + 5 * torch.pow(control[:, 0], 2)
         return utility
