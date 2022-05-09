@@ -162,7 +162,7 @@ def plot_phase_plot(methods, log_dir, simu_dir,
     '''
     config = GeneralConfig()
     if x_init is None:
-        x_init = [1.1, 0.0, 5.0 / 180 * np.pi, 0.0, 15 * np.pi]
+        x_init = [0.1, 0.0, 5.0 / 180 * np.pi, 0.0, 0.0]
     S_DIM = config.INPUT_DIM
     A_DIM = config.ACTION_DIM
     policy = Actor(S_DIM, A_DIM)

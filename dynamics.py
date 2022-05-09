@@ -324,4 +324,4 @@ class VehicleDynamics(DynamicsConfig):
         utility = self.q[0] * torch.pow(bias[:, 0], 2) \
                   + self.q[1] * torch.pow(bias[:, 2], 2) \
                   + self.r * torch.pow(control[:, 0], 2)
-        return utility
+        return 5 * utility

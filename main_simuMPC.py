@@ -112,12 +112,12 @@ def simulation(methods, log_dir, simu_dir):
 
 
 if __name__ == '__main__':
-    log_dir = "Results/2022-0509-1646"
+    log_dir = "Results/2022-0509-1756"
     METHODS = ['ADP', 'MPC-5', 'MPC-10', 'MPC-30', 'OP'] #
     simu_dir = log_dir + "-Simu"
     os.makedirs(simu_dir, exist_ok=True)
-    simulation(METHODS, log_dir, simu_dir)
-    # plot_phase_plot(['ADP', 'MPC-5', 'MPC-10', 'MPC-30'], log_dir, simu_dir, data='Phase plot')
-    # plot_phase_plot(['ADP', 'MPC-5', 'MPC-10', 'MPC-30'], log_dir, simu_dir, data='Lat position')
-    # plot_phase_plot(['ADP', 'MPC-5', 'MPC-10', 'MPC-30'], log_dir, simu_dir, data='Head angle')
-    # plot_phase_plot(['ADP', 'MPC-5', 'MPC-10', 'MPC-30'], log_dir, simu_dir, data='Control')
+    # simulation(METHODS, log_dir, simu_dir)
+    plot_phase_plot(['ADP', 'MPC-5', 'MPC-10', 'MPC-30'], log_dir, simu_dir, data='Phase plot')
+    plot_phase_plot(['ADP', 'MPC-5', 'MPC-10', 'MPC-30'], log_dir, simu_dir, data='Lat position')
+    plot_phase_plot(['ADP', 'MPC-5', 'MPC-10', 'MPC-30'], log_dir, simu_dir, data='Head angle')
+    plot_phase_plot(['ADP', 'MPC-5', 'MPC-10', 'MPC-30'], log_dir, simu_dir, data='Control')

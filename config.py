@@ -7,8 +7,8 @@ class GeneralConfig(object):
     INPUT_DIM = 6
     ACTION_DIM = 1
     BUFFER_SIZE = 5000
-    FORWARD_STEP = 10
-    GAMMA_D = 0.96
+    FORWARD_STEP = 20
+    GAMMA_D = 1.00
     RESET_ITERATION = 10000
 
     NP = 50
@@ -37,14 +37,14 @@ class DynamicsConfig(GeneralConfig):
     k1 = 88000    # front axle cornering stiffness for linear model (N / rad)
     k2 = 94000    # rear axle cornering stiffness for linear model (N / rad)
     Is = 1.        # steering ratio
-    Ts = 0.05      # control signal period
+    Ts = 0.02      # control signal period
     N = 314        # total simulation steps
 
     F_z1 = m * g * b / L    # Vertical force on front axle
     F_z2 = m * g * a / L    # Vertical force on rear axle
 
     k_curve = 1/10          # curve shape of a * sin(kx)
-    a_curve = 1           # curve shape of a * sin(kx)
+    a_curve = 1             # curve shape of a * sin(kx)
     psi_init = a_curve * k_curve # initial position of psi
 
     # ADP reset state range
@@ -55,7 +55,8 @@ class DynamicsConfig(GeneralConfig):
     x_init_s = [0.01, 0.0, psi_init, 0.0, 0.0]
 
     q = [0.1, 1.0]
-    r = 1.0
+    r = 5.0
+    init_bias_factor = 0.5
 
 class PlotConfig(object):
     fig_size = (8.5, 6.5)

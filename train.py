@@ -49,14 +49,20 @@ class Train(DynamicsConfig):
         self.initialize_state()
 
     def initialize_state(self):
-        self.agent_batch[:, 0] = torch.normal(0.0, 0.1, [self.BATCH_SIZE, ])
-        self.agent_batch[:, 1] = torch.normal(0.0, 0.05, [self.BATCH_SIZE, ])
-        self.agent_batch[:, 2] = torch.normal(0.0, 0.05, [self.BATCH_SIZE, ])
-        self.agent_batch[:, 3] = torch.normal(0.0, 0.02, [self.BATCH_SIZE, ])
-        self.agent_batch[:, 4] = torch.linspace(0.0, np.pi, self.BATCH_SIZE)
-        # init_ref = self.dynamics.reference_trajectory(self.agent_batch[:, 4])
+        self.agent_batch = self.generate_random_state(self.BATCH_SIZE)
+
+    def generate_random_state(self, batch_size):
+        random_bias = torch.cat((torch.normal(0.0, self.init_bias_factor * 0.2, [batch_size, 1]),
+                                 torch.normal(0.0, self.init_bias_factor * 0.05, [batch_size, 1]),
+                                 torch.normal(0.0, self.init_bias_factor * 0.05, [batch_size, 1]),
+                                 torch.normal(0.0, self.init_bias_factor * 0.02, [batch_size, 1]),
+                                 torch.linspace(0.0, 2 * np.pi / self.k_curve, batch_size)[:, np.newaxis]), 1)
+        ref = self.dynamics.reference_trajectory(random_bias[:, 4])
         # self.agent_batch[:, 0:4] = self.state_batch + init_ref
-        self.init_state = self.agent_batch
+        random_state = torch.cat((random_bias[:, :-1] + ref[:, :-1],
+                                     random_bias[:, -1][:, np.newaxis]), 1)
+        # self.init_state = self.agent_batch.clone().detach()
+        return random_state
 
     def check_done(self, state):
         """
@@ -100,7 +106,7 @@ class Train(DynamicsConfig):
         """
         for i in range(self.BATCH_SIZE):
             if self._reset_index[i] == 1:
-                state[i, :] = self.init_state[i, :]
+                state[i, :] = self.generate_random_state(1).squeeze()
         return state
 
     def update_state(self, policy, dynamics):
@@ -113,13 +119,14 @@ class Train(DynamicsConfig):
         dynamics: object dynamics.
 
         """
-        self.agent_batch = self.check_done(self.agent_batch)
+        # self.agent_batch = self.check_done(self.agent_batch)
+        self.agent_batch = self.generate_random_state(self.BATCH_SIZE)
         self.agent_batch.detach_()
         # ref_trajectory = dynamics.reference_trajectory(self.agent_batch[:, -1])
         # self.state_batch = self.agent_batch[:, 0:4] - ref_trajectory
-        control = policy.forward(self.preprocessor.torch_preprocess(self.agent_batch, self.agent_batch[:, -1]))
-        # self.agent_batch, self.state_batch = dynamics.step_relative(self.agent_batch, control)
-        self.agent_batch, _, _, _, _, _, _ = dynamics.step(self.agent_batch, control)
+        # control = policy.forward(self.preprocessor.torch_preprocess(self.agent_batch, self.agent_batch[:, -1]))
+        # # self.agent_batch, self.state_batch = dynamics.step_relative(self.agent_batch, control)
+        # self.agent_batch, _, _, _, _, _, _ = dynamics.step(self.agent_batch, control)
         self.iteration_index += 1
 
     def policy_evaluation(self, policy, value, dynamics):
@@ -160,8 +167,8 @@ class Train(DynamicsConfig):
         self.sum_utility = torch.sum(self.utility,0)
         target_value = self.sum_utility.detach() + self.GAMMA_D ** self.FORWARD_STEP * self.value_next.detach()
         value_now = value.forward(self.preprocessor.torch_preprocess(self.agent_batch, self.virtual_ref_start[:, -1]))
-        value_equilibrium = value.forward(self.preprocessor.torch_preprocess(self.virtual_ref_start.detach().clone(),
-                                                                             self.virtual_ref_start[:, -1].detach().clone()))
+        value_equilibrium = torch.mean(value.forward(self.preprocessor.torch_preprocess(self.virtual_ref_start.detach().clone(),
+                                                                             self.virtual_ref_start[:, -1].detach().clone())))
         value_loss = 1 / 2 * torch.mean(torch.pow((target_value - value_now), 2)) # + 10 * torch.pow(value_equilibrium, 2)
         self.state_batch.requires_grad_(False)
         value.zero_grad()
@@ -231,10 +238,10 @@ class Train(DynamicsConfig):
 
 class Preprocessor(DynamicsConfig):
     def __init__(self):
-        self._norm_matrix = 0.1 * torch.tensor([2, 5, 10, 10, 1/(2*np.pi*self.k_curve), 1/(2*np.pi*self.k_curve)], dtype=torch.float32)
+        self._norm_matrix = 0.1 * torch.tensor([2, 5, 10, 10, self.k_curve / (2*np.pi), self.k_curve / (2*np.pi)], dtype=torch.float32)
 
     def torch_preprocess(self, state, ref_start_x):
-        real_x = state[:, -1] % (2 * np.pi * self.k_curve)
-        real_ref_start_x = ref_start_x % (2 * np.pi * self.k_curve)
+        real_x = state[:, -1] % (2 * np.pi / self.k_curve)
+        real_ref_start_x = ref_start_x % (2 * np.pi / self.k_curve)
         res_state = torch.cat((state[:,:-1], real_x[:, np.newaxis], real_ref_start_x[:, np.newaxis]), 1)
         return torch.mul(res_state, self._norm_matrix)

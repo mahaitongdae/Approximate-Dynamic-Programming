@@ -32,8 +32,8 @@ METHODS = ['MPC-5',
            'ADP',    # Approximate dynamic programming,
            'OPEN']     # Open-loop
 MAX_ITERATION = 1000         # max iterations
-LR_P = 1e-3                  # learning rate of policy net
-LR_V = 1e-3                  # learning rate of value net
+LR_P = 5e-4                  # learning rate of policy net
+LR_V = 5e-4                  # learning rate of value net
 
 # Environment tasks
 TRAIN_FLAG = 1

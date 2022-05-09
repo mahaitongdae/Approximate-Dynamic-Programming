@@ -33,16 +33,17 @@ class Actor(nn.Module):
             nn.ELU(),
             nn.Linear(256, 256),
             nn.ELU(),
+            nn.Linear(256, 256),
+            nn.ELU(),
+            nn.Linear(256, 256),
+            nn.ELU(),
             nn.Linear(256, output_size),
             nn.Tanh()
         )
         # initial optimizer
         self.opt = torch.optim.Adam(self.parameters(), lr=lr)
-        self.scheduler = torch.optim.lr_scheduler.StepLR(self.opt, 100, gamma=0.95, last_epoch=-1)
+        self.scheduler = torch.optim.lr_scheduler.StepLR(self.opt, 1000, gamma=0.95, last_epoch=-1)
         self._initialize_weights()
-
-        # zeros state value
-        self._zero_state = torch.tensor([0.0, 0.0, 0.0, 0.0])
 
     def forward(self, x):
         """
@@ -103,6 +104,8 @@ class Critic(nn.Module):
         # initial parameters of actor
         self.layers = nn.Sequential(
             nn.Linear(input_size, 256),
+            nn.ELU(),
+            nn.Linear(256, 256),
             nn.ELU(),
             nn.Linear(256, 256),
             nn.ELU(),
