@@ -31,9 +31,9 @@ METHODS = ['MPC-5',
            'MPC-30', # MPC-"prediction steps of MPC",
            'ADP',    # Approximate dynamic programming,
            'OPEN']     # Open-loop
-MAX_ITERATION = 11000        # max iterations
-LR_P = 6e-4                  # learning rate of policy net
-LR_V = 6e-3                  # learning rate of value net
+MAX_ITERATION = 1000         # max iterations
+LR_P = 1e-3                  # learning rate of policy net
+LR_V = 1e-3                  # learning rate of value net
 
 # Environment tasks
 TRAIN_FLAG = 1
@@ -46,16 +46,15 @@ torch.manual_seed(0)
 
 #  ============= initialization  ==================
 config = GeneralConfig()
-policy = Actor(config.STATE_DIM, config.ACTION_DIM, lr=LR_P)
-value = Critic(config.STATE_DIM, 1, lr=LR_V)
+policy = Actor(config.INPUT_DIM, config.ACTION_DIM, lr=LR_P)
+value = Critic(config.INPUT_DIM, 1, lr=LR_V)
 vehicleDynamics = dynamics.VehicleDynamics()
-state_batch = vehicleDynamics.initialize_state()
 
 # ================== Training =====================
 iteration_index = 0
 
 if TRAIN_FLAG == 1:
-    print_iters = 50
+    print_iters = 10
     print("********************************** START TRAINING **********************************")
     print("************************** PRINT LOSS EVERY "+ str(print_iters) + "iterations ***************************")
     # train network by policy iteration
@@ -76,7 +75,7 @@ if TRAIN_FLAG == 1:
 
         # save parameters, run simulation and plot figures
         if iteration_index == MAX_ITERATION:
-            log_dir = "./Results/" + datetime.now().strftime("%Y-%m%d-%H%M-")
+            log_dir = "./Results/" + datetime.now().strftime("%Y-%m%d-%H%M")
             os.makedirs(log_dir, exist_ok=True)
             value.save_parameters(log_dir)
             policy.save_parameters(log_dir)

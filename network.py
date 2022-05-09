@@ -54,8 +54,8 @@ class Actor(nn.Module):
         -------
         value of current state
         """
-        temp = torch.mul(x, self._norm_matrix)
-        x = torch.mul(self._out_gain, self.layers(temp))
+        # temp = torch.mul(x, self._norm_matrix)
+        x = torch.mul(self._out_gain, self.layers(x))
         return x
 
     def _initialize_weights(self):
@@ -145,7 +145,7 @@ class Critic(nn.Module):
         -------
         value of current state
         """
-        x = torch.mul(x, self._norm_matrix)
+        # x = torch.mul(x, self._norm_matrix)
         x = self.layers(x)
         return x
 
@@ -173,3 +173,4 @@ class Critic(nn.Module):
 
     def load_parameters(self, load_dir):
         self.load_state_dict(torch.load(os.path.join(load_dir,'critic.pth')))
+

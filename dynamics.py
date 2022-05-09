@@ -26,27 +26,27 @@ class VehicleDynamics(DynamicsConfig):
         self._state = torch.zeros([self.BATCH_SIZE, self.DYNAMICS_DIM])
         self.init_state = torch.zeros([self.BATCH_SIZE, self.DYNAMICS_DIM])
         self._reset_index = np.zeros([self.BATCH_SIZE, 1])
-        self.initialize_state()
+        # self.initialize_state()
         super(VehicleDynamics, self).__init__()
 
-    def initialize_state(self):
-        """
-        random initialization of state.
-
-        Returns
-        -------
-
-        """
-        self.init_state[:, 0] = torch.normal(0.0, 0.6, [self.BATCH_SIZE,])
-        self.init_state[:, 1] = torch.normal(0.0, 0.4, [self.BATCH_SIZE,])
-        self.init_state[:, 2] = torch.normal(0.0, 0.15, [self.BATCH_SIZE,])
-        self.init_state[:, 3] = torch.normal(0.0, 0.1, [self.BATCH_SIZE,])
-        self.init_state[:, 4] = torch.linspace(0.0, np.pi, self.BATCH_SIZE)
-        init_ref = self.reference_trajectory(self.init_state[:, 4])
-        init_ref_all = torch.cat((init_ref, torch.zeros([self.BATCH_SIZE,1])),1)
-        self._state = self.init_state
-        init_state = self.init_state + init_ref_all
-        return init_state
+    # def initialize_state(self):
+    #     """
+    #     random initialization of state.
+    #
+    #     Returns
+    #     -------
+    #
+    #     """
+    #     self.init_state[:, 0] = torch.normal(0.0, 0.6, [self.BATCH_SIZE,])
+    #     self.init_state[:, 1] = torch.normal(0.0, 0.4, [self.BATCH_SIZE,])
+    #     self.init_state[:, 2] = torch.normal(0.0, 0.15, [self.BATCH_SIZE,])
+    #     self.init_state[:, 3] = torch.normal(0.0, 0.1, [self.BATCH_SIZE,])
+    #     self.init_state[:, 4] = torch.linspace(0.0, np.pi, self.BATCH_SIZE)
+    #     init_ref = self.reference_trajectory(self.init_state[:, 4])
+    #     # init_ref_all = torch.cat((init_ref, torch.zeros([self.BATCH_SIZE,1])),1)
+    #     self._state = self.init_state
+    #     init_state = self.init_state + init_ref
+    #     return init_state
 
     def relative_state(self, state):
         x_ref = self.reference_trajectory(state[:, -1])
@@ -104,13 +104,13 @@ class VehicleDynamics(DynamicsConfig):
         deri_omega_r = (torch.mul(self.a * F_y1, torch.cos(delta)) - self.b * F_y2) / self.I_zz
         deri_x = self.u * torch.cos(psi) - u_lateral * torch.sin(psi)
 
-        deri_state = torch.cat((deri_y[np.newaxis, :],
-                                deri_u_lat[np.newaxis, :],
-                                deri_psi[np.newaxis, :],
-                                deri_omega_r[np.newaxis, :],
-                                deri_x[np.newaxis, :]), 0)
+        deri_state = torch.cat((deri_y[:, np.newaxis],
+                                deri_u_lat[:, np.newaxis],
+                                deri_psi[:, np.newaxis],
+                                deri_omega_r[:, np.newaxis],
+                                deri_x[:, np.newaxis]), 1)
 
-        return deri_state.T, F_y1, F_y2, alpha_1, alpha_2
+        return deri_state, F_y1, F_y2, alpha_1, alpha_2
 
     def _state_function_linear(self, state, control):
         """
@@ -164,13 +164,13 @@ class VehicleDynamics(DynamicsConfig):
         deri_omega_r = (torch.mul(self.a * F_y1, torch.cos(delta)) - self.b * F_y2) / self.I_zz
         deri_x = self.u * torch.cos(psi) - u_lateral * torch.sin(psi)
 
-        deri_state = torch.cat((deri_y[np.newaxis, :],
-                                deri_u_lat[np.newaxis, :],
-                                deri_psi[np.newaxis, :],
-                                deri_omega_r[np.newaxis, :],
-                                deri_x[np.newaxis, :]), 0)
+        deri_state = torch.cat((deri_y[:, np.newaxis],
+                                deri_u_lat[:, np.newaxis],
+                                deri_psi[:, np.newaxis],
+                                deri_omega_r[:, np.newaxis],
+                                deri_x[:, np.newaxis]), 1)
 
-        return deri_state.T, F_y1, F_y2, alpha_1, alpha_2
+        return deri_state, F_y1, F_y2, alpha_1, alpha_2
 
     def reference_trajectory(self, state):
         """
@@ -222,12 +222,23 @@ class VehicleDynamics(DynamicsConfig):
             psi_ref = lane_angle
 
         zeros = torch.zeros([len(state), ])
-        state_ref = torch.cat((y_ref[np.newaxis, :],
-                                zeros[np.newaxis, :],
-                                psi_ref[np.newaxis, :],
-                                zeros[np.newaxis, :]), 0)
-        return state_ref.T
+        state_ref = torch.cat((y_ref[:, np.newaxis],
+                                zeros[:, np.newaxis],
+                                psi_ref[:, np.newaxis],
+                                zeros[:, np.newaxis],
+                                state[:, np.newaxis]), 1)
+        return state_ref
 
+    def reference_trajectory_rollout(self, ref_start, current_state):
+        current_x = current_state[:, -1]
+        ref_start_x = ref_start[:, -1]
+        current_ref_y = ref_start[:, 0] + torch.tan(current_x - ref_start_x)
+        if self.ref_rollout_type == 'tangent':
+            return torch.cat((current_ref_y[:, np.newaxis], ref_start[:, 1:-1], current_x[:, np.newaxis]), 1)
+        elif self.ref_rollout_type == 'fixed':
+            return torch.cat((ref_start[:, 0:-1], current_x[:, np.newaxis]), 1)
+        else:
+            raise NotImplementedError
 
     def step(self, state, control):
         """
@@ -262,7 +273,8 @@ class VehicleDynamics(DynamicsConfig):
         else:
             deri_state, F_y1, F_y2, alpha_1, alpha_2 = self._state_function_linear(state, control)
         state_next = state + self.Ts * deri_state
-        utility = self.utility(state, control)
+        # utility = self.utility(state, control)
+        utility = torch.zeros_like(state[:, 0]) # todo: temp set to zero
         f_xu = deri_state[:, 0:4]
         return state_next, f_xu, utility, F_y1, F_y2, alpha_1, alpha_2
 
@@ -290,14 +302,16 @@ class VehicleDynamics(DynamicsConfig):
         utility = self.utility(state_r_next, u)
         return state_next.clone().detach(), state_r_next.clone().detach()
 
-    @staticmethod
-    def utility(state, control):
+    # @staticmethod
+    def utility(self, state, ref, control):
         """
 
         Parameters
         ----------
         state: tensor       shape: [BATCH_SIZE, STATE_DIMENSION]
             current state
+        ref: tensor       shape: [BATCH_SIZE, STATE_DIMENSION]
+            current reference
         control: tensor     shape: [BATCH_SIZE, ACTION_DIMENSION]
             current control signal
 
@@ -306,5 +320,8 @@ class VehicleDynamics(DynamicsConfig):
         utility: tensor   shape: [BATCH_SIZE, ]
             utility, i.e. l(x,u)
         """
-        utility = 0.2 * torch.pow(state[:, 0], 2) + 1 * torch.pow(state[:, 2], 2) + 5 * torch.pow(control[:, 0], 2)
+        bias = state - ref
+        utility = self.q[0] * torch.pow(bias[:, 0], 2) \
+                  + self.q[1] * torch.pow(bias[:, 2], 2) \
+                  + self.r * torch.pow(control[:, 0], 2)
         return utility

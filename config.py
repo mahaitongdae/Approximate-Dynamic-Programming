@@ -3,11 +3,12 @@ import numpy as np
 class GeneralConfig(object):
     BATCH_SIZE = 256
     DYNAMICS_DIM = 5
-    STATE_DIM = 4
+    STATE_DIM = 5
+    INPUT_DIM = 6
     ACTION_DIM = 1
     BUFFER_SIZE = 5000
-    FORWARD_STEP = 20
-    GAMMA_D = 1
+    FORWARD_STEP = 10
+    GAMMA_D = 0.96
     RESET_ITERATION = 10000
 
     NP = 50
@@ -21,6 +22,7 @@ class DynamicsConfig(GeneralConfig):
     nonlinearity = True
     tire_model = 'Pacejka'    # Fiala, Pacejka, Linear
     reference_traj = 'SIN'
+    ref_rollout_type = 'fixed'
 
     a = 1.14       # distance c.g.to front axle(m)
     L = 2.54       # wheel base(m)
@@ -29,7 +31,7 @@ class DynamicsConfig(GeneralConfig):
     I_zz = 2420.0  # yaw moment of inertia(kg * m ^ 2)
     C = 1.43       # parameter in Pacejka tire model
     B = 14.        # parameter in Pacejka tire model
-    u = 15         # longitudinal velocity(m / s)
+    u = 10         # longitudinal velocity(m / s)
     g = 9.81
     D = 0.75
     k1 = 88000    # front axle cornering stiffness for linear model (N / rad)
@@ -41,7 +43,7 @@ class DynamicsConfig(GeneralConfig):
     F_z1 = m * g * b / L    # Vertical force on front axle
     F_z2 = m * g * a / L    # Vertical force on rear axle
 
-    k_curve = 1/30          # curve shape of a * sin(kx)
+    k_curve = 1/10          # curve shape of a * sin(kx)
     a_curve = 1           # curve shape of a * sin(kx)
     psi_init = a_curve * k_curve # initial position of psi
 
@@ -51,6 +53,9 @@ class DynamicsConfig(GeneralConfig):
     beta_range = 1.0
 
     x_init_s = [0.01, 0.0, psi_init, 0.0, 0.0]
+
+    q = [0.1, 1.0]
+    r = 1.0
 
 class PlotConfig(object):
     fig_size = (8.5, 6.5)

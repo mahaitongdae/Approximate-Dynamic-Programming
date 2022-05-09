@@ -141,10 +141,10 @@ class Solver(DynamicsConfig):
             else:
                 lbw += [-inf, -20, -pi, -20, -inf]
                 ubw += [inf, 20, pi, 20, inf]
-            F_cost = Function('F_cost', [x, u], [0.1 * (x[0] - self.a_curve * sin(self.k_curve * x[4])) ** 2
-                                                 + 0.1 * (x[2] - arctan(
+            F_cost = Function('F_cost', [x, u], [self.q[0] * (x[0] - self.a_curve * sin(self.k_curve * x[4])) ** 2
+                                                 + self.q[1] * (x[2] - arctan(
                 self.a_curve * self.k_curve * cos(self.k_curve * x[4]))) ** 2
-                                                 + 0.001 * u[0] ** 2])
+                                                 + self.r * u[0] ** 2])
             J += F_cost(w[k * 2], w[k * 2 - 1])
 
         # Create NLP solver
@@ -165,6 +165,19 @@ class Solver(DynamicsConfig):
             control[i] = state_all[nt * i + nt - 1]
         return state, control
 
+    def _record_reference_trajectory(self, state):
+        self.ref_start_x = state[0]
+        self.ref_y = self.a_curve * sin(self.k_curve * state[4])
+        self.ref_theta = atan(self.a_curve * self.k_curve * cos(self.k_curve * state[4]))
+
+    def _compute_reference_point(self, state):
+        if self.ref_rollout_type == 'tangent':
+            return state[0] + tan(self.ref_theta) * (state[-1]-self.ref_start_x), self.ref_theta
+        elif self.ref_rollout_type == 'fixed':
+            return self.ref_y, self.ref_theta
+        else:
+            raise NotImplementedError
+
     def mpcSolver(self, x_init, predict_steps):
         """
         Solver of nonlinear MPC
@@ -183,6 +196,7 @@ class Solver(DynamicsConfig):
         control: np.array   shape: [predict_steps, control_dimension]
             control signal of MPC in the whole predict horizon.
         """
+        self._record_reference_trajectory(x_init)
         tire_model = self.tire_model
         if tire_model == 'Fiala':
             DYNAMICS_DIM = 6
@@ -314,10 +328,10 @@ class Solver(DynamicsConfig):
                                                      + 80 * u[0] ** 2
                                                      + 0.3 * u[1] ** 2])
             else:
-                F_cost = Function('F_cost', [x, u], [0.2 * (x[0]) ** 2
-                                                     + 1 * (x[2]) ** 2
-                                                     + 5 * u[0] ** 2])
-            J += F_cost(w[k * 2], w[k * 2 - 1])
+                F_cost = Function('F_cost', [x, u], [self.q[0] * (x[0]-self._compute_reference_point(x)[0]) ** 2
+                                                     + self.q[1] * (x[2]-self._compute_reference_point(x)[1]) ** 2
+                                                     + self.r * u[0] ** 2])
+            J += self.GAMMA_D ** (k - 1) * F_cost(w[k * 2], w[k * 2 - 1])
             # J += F_cost(w[k * 3 - 1], w[k * 3 - 2])
 
         # Create NLP solver
